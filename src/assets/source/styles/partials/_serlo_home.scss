@@ -378,6 +378,9 @@ $homeBreakpoint-xxl: 1580px;
 
     .subject-nav-center {
       margin-right: 227px;
+      @media screen and (max-width: $screen-sm) {
+        margin-right: 0;
+      }
     }
 
     #subject-nav-wrapper, .subject-nav-center {
@@ -387,7 +390,6 @@ $homeBreakpoint-xxl: 1580px;
 
     #search-content {
       width: 220px;
-
       @media screen and (max-width: $homeBreakpoint-md-max) {
         width: 100%;
       }

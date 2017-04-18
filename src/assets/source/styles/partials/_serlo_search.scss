@@ -17,8 +17,13 @@
 }
 
 #search-content {
+  @media screen and (max-width: $screen-sm) {
+    padding-right: 15px;
+  }
   display: block;
   position: relative;
+
+
 
   width: $navigationWidth;
   margin-bottom: 0px;
@@ -156,6 +161,9 @@
 }
 
 .form-search {
+  @media screen and (max-width: $screen-sm) {
+    margin-left: 15px;
+  }
   *[type="submit"] {
     height: 34px;
   }

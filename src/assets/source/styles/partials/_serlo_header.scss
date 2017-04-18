@@ -3,6 +3,9 @@
   height: 75px;
   line-height: 75px;
   margin-top: 50px;
+  @media screen and (max-width: $screen-sm) {
+    padding: 0 15px;
+  }
 
   @media (min-width: $navigationBreakPoint-min) {
     .authentification, .notifications {
@@ -16,6 +19,9 @@
 
     button {
       margin-left: $pagePaddingMedium;
+      @media screen and (max-width: $screen-sm) {
+        margin-left: 0;
+      }
 
       font-size: .75em;
 
@@ -134,6 +140,14 @@
   }
 }
 
+#header {
+  .container {
+    @media screen and (max-width: $screen-sm) {
+      padding: 0;
+    }
+  }
+}
+
 #subject-nav {
   position: relative;
   padding: 0;
@@ -176,6 +190,9 @@
 
   #subject-nav-wrapper {
     background: $backgroundColor;
+    @media screen and (max-width: $screen-sm) {
+      padding: 0 15px;
+    }
   }
 
   #breadcrumbs {
@@ -205,7 +222,11 @@
         font-weight: bold;
       }
     }
-
+    @media screen and (max-width: $screen-sm) {
+      .controls {
+        display: none;
+      }
+    }
     .backlink {
       display: none;
     }
@@ -213,37 +234,25 @@
 
   .backlink-only {
     .subject-nav-center {
-      width: 45px;
+      width: 70%;
     }
-
-    .controls {
-      display: none;
-    }
-
-    #breadcrumbs {
-      padding: 9px 0 6px;
-      margin: 0;
-
-      > li {
+    @media screen and (max-width: $screen-sm) {
+      .controls {
         display: none;
-      }
-
-      .backlink {
-        display: inline-block;
-        font-size: 20px;
-        width: 45px;
-
-        a {
-          display: block;
-          text-align: center;
-        }
       }
     }
 
     #search-content {
       width: 100%;
+      @media screen and (max-width: $screen-sm) {
+        width: 30%;
+      }
       margin-right: -52px;
       padding-right: 52px;
+      @media screen and (max-width: $screen-sm) {
+        margin-right: auto;
+        padding-right: 15px;
+      }
     }
   }
 

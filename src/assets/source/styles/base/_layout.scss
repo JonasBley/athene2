@@ -22,6 +22,9 @@
 }
 
 #horizon {
+  @media screen and (max-width: $screen-sm) {
+    display: none;
+  }
   clear: both;
   padding: 50px 0 100px 0;
 }
@@ -137,6 +140,11 @@
   // For Now
   min-height: 670px;
   padding: 0 $contentPadding $contentPadding;
+  &.course-page {
+    @media screen and (max-width: $screen-sm) {
+      padding: 0 40px $contentPadding 20px;
+    }
+  }
 
   float: left;
   // box-sizing: content-box;
@@ -161,6 +169,9 @@
 
 /* Right Context Area */
 .side-context {
+  @media screen and (max-width: $screen-sm) {
+    display: none;
+  }
   position: absolute;
   top: $sideNavTopOffset;
   right: -($sidebarWidth + $sidebarGap);
@@ -199,6 +210,9 @@
 
     .layout-toggle {
       display: block;
+      @media screen and (max-width: $screen-sm) {
+        display: none;
+      }
     }
   }
 

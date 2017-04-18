@@ -42,8 +42,7 @@ define('breadcrumbs', ['jquery'], function ($) {
             return new Breadcrumbs(options);
         }
 
-        var self = this,
-            elements;
+        var self = this;
 
         self.options = options ? $.extend({}, defaults, options) : $.extend({}, defaults);
 
@@ -54,25 +53,42 @@ define('breadcrumbs', ['jquery'], function ($) {
             $(this).find('a').append(self.options.icon.clone());
         });
 
-        elements = this.$breadcrumbs.children().slice(0, -1);
+        // defines all elements
+        self.elements = this.$breadcrumbs.children();
+        self.elementsCopy = [];
+        $.each(self.elements, function (i, n) {
+            self.elementsCopy.push(n);
+        });
+        console.log(this.elements, 'elements');
 
-        // queue of shown elements
+        // queue of shown elements that are not subject name, content name and second to last element
         self.shownElements = [];
+        // queue of shown default elements (subject name, content name and second to last element)
+        self.shownDefaultElements = [];
         // stack of hidden elements
         self.hiddenElements = [];
+        // stack of hidden default elements
+        self.hiddenDefaultElements = [];
 
-        if (elements.length > 0) {
-            self.shownElements = new Array(elements.length - 1);
+        Breadcrumbs.prototype.makeDefaultElements = function () {
+            console.log(this.elementsCopy, 'elements copy');
+            self.elementsCopy.shift();
+            console.log(this.elementsCopy, 'elements copy');
+            self.elementsCopy.pop();
+            self.elementsCopy.pop();
+        };
 
-            elements.each(function (i, el) {
-                if (i === 0) {
-                    return true;
-                }
-
-                self.shownElements[i - 1] = $(el);
+        // fills shownElements and shownDefaultElements Arrays
+        if (this.elements.length > 0) {
+            this.elements.slice(1, -2).each(function (i, el) {
+                self.shownElements.push(el);
             });
-
-            self.initBacklink(elements.last().clone());
+            self.makeDefaultElements();
+            $(this.elementsCopy).each(function (i, el2) {
+                self.shownDefaultElements.push(el2);
+            });
+            console.log(this.shownElements, 'shown Elements');
+            console.log(this.shownDefaultElements, 'Shown Default Elements');
             self.initDots();
         } else {
             self.$wrapper.addClass('has-no-backlink');
@@ -83,19 +99,6 @@ define('breadcrumbs', ['jquery'], function ($) {
         $(window).bind('resizeDelay', function () {
             self.adaptHeight();
         });
-    };
-
-    /**
-     * @method initBacklink
-     * @param {jquery} el the backlink
-     */
-    Breadcrumbs.prototype.initBacklink = function (el) {
-        this.backlink = el;
-        this.backlink.addClass('backlink');
-        this.backlink.children().first().find('span').remove();
-        this.backlink.children().first().find('i').removeClass('fa-angle-left').addClass('fa-chevron-left');
-
-        this.$breadcrumbs.append(this.backlink);
     };
 
     /**
@@ -110,19 +113,30 @@ define('breadcrumbs', ['jquery'], function ($) {
     };
 
     /**
-     * @method hasShownElements
-     * @return {boolean} true iff there are shown elements
+     * @method hasxElements
+     * @return {boolean} true if there are two/three elements (idea: delete last element when at 3, delete first when at 2)
      */
-    Breadcrumbs.prototype.hasShownElements = function () {
-        return this.shownElements.length > 0;
+    Breadcrumbs.prototype.hasThreeElements = function () {
+        return  this.shownElements.length === 0;
     };
 
+    Breadcrumbs.prototype.hasTwoElements = function () {
+        return this.shownDefaultElements === 2;
+    };
+
+    Breadcrumbs.prototype.hasOneElement = function () {
+        return this.shownDefaultElements === 1;
+    };
+
+    Breadcrumbs.prototype.hasShownElements = function () {
+        return  this.shownElements.length > 0;
+    };
     /**
      * @method hasHiddenElements
      * @return {boolean} true iff there are hidden elements
      */
     Breadcrumbs.prototype.hasHiddenElements = function () {
-        return this.hiddenElements.length > 0;
+        return this.hiddenElements.length > 0 || this.hiddenDefaultElements > 0;
     };
 
     /**
@@ -139,13 +153,22 @@ define('breadcrumbs', ['jquery'], function ($) {
      * Shows the first hidden element
      */
     Breadcrumbs.prototype.showNextElement = function () {
-        var el = this.hiddenElements.pop();
-        el.removeClass('hidden');
-        this.shownElements.unshift(el);
+        if (this.hasThreeElements()) {
+            var el = this.hiddenElements.pop();
+            el.removeClass('hidden');
+            this.shownElements.unshift(el);
+        }
 
         // hide suspension points if there are no hidden elements left
         if (!this.hasHiddenElements()) {
             this.$dots.addClass('hidden');
+        }
+    };
+    Breadcrumbs.prototype.showNextDefaultElement = function () {
+        if (!this.hasShownElements()) {
+            var el = this.hiddenDefaultElements.pop();
+            el.removeClass('hidden');
+            this.shownDefaultElements.unshift(el);
         }
     };
 
@@ -155,13 +178,31 @@ define('breadcrumbs', ['jquery'], function ($) {
      * Hides the last shown element
      */
     Breadcrumbs.prototype.hideNextElement = function () {
-        var el = this.shownElements.shift();
-        el.addClass('hidden');
-        this.hiddenElements.push(el);
+        var el3 = $(this.shownElements).shift();
+        console.log(this.shownElements, 'shown Elements after first hide');
+        el3.addClass('hidden');
+        this.hiddenElements.push(el3);
 
         // show suspension points and update its href
         this.$dots.removeClass('hidden');
-        this.$dotsLink.attr('href', el.children().first().attr('href'));
+        this.$dotsLink.attr('href', el3.children().first().attr('href'));
+    };
+
+    Breadcrumbs.prototype.hideContentName = function () {
+        var contentName = $(this.shownDefaultElements).last();
+        contentName.addClass('hidden');
+        this.hiddenDefaultElements.push(contentName);
+        this.shownDefaultElements.pop();
+    };
+
+    Breadcrumbs.prototype.hideSubjectName = function () {
+        var subjectName = this.shownDefaultElements[0];
+        subjectName.addClass('hidden');
+        this.hiddenDefaultElements.push(subjectName);
+        this.shownDefaultElements.shift();
+
+        // hide dots when Subject Name is removed
+        this.$dots.addClass('hidden');
     };
 
     /**
@@ -177,14 +218,22 @@ define('breadcrumbs', ['jquery'], function ($) {
 
         while (self.hasHiddenElements() && !self.isTooHigh()) {
             self.showNextElement();
+            self.showNextDefaultElement();
         }
 
         while (self.hasShownElements() && self.isTooHigh()) {
             self.hideNextElement();
         }
-
-        // show backlink only if still to high
-        if (self.isTooHigh()) {
+        // When only three Elements are left, the content title will be removed
+        if (self.hasThreeElements() && self.isTooHigh()) {
+            self.hideContentName();
+        }
+        // When only two Elements are left, the subject title will be removed
+        else if (self.hasTwoElements() && self.isTooHigh()) {
+            self.hideSubjectName();
+        }
+        // show backlink only if still too high
+        else if (self.hasOneElement() && self.isTooHigh()) {
             self.$wrapper.addClass('backlink-only');
         }
     };

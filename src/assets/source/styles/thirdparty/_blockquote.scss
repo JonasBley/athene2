@@ -55,6 +55,9 @@
   &.blockquote-primary {
     border-color: $btn-primary-bg;
     .square, &.square, &.square {
+      @media screen and (max-width: $screen-sm) {
+        max-width: 50px;
+      }
       background-color: $btn-primary-border;
       color: #FFF;
       & > .badge {
@@ -68,6 +71,9 @@
     .square {
       background-color: $btn-success-border;
       color: #FFF;
+      @media screen and (max-width: $screen-sm) {
+        max-width: 50px;
+      }
       & > .badge {
         background-color: lighten($btn-success-border, 10%);
       }
